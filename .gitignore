@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+*.swp
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# Built bundles & artifacts (rebuilt via swift build / notarize.sh)
+Nazar.app/
+CCClear.app/
+*.dmg
+*.zip
+
+# Logs
+*.log
+
+# Secrets — never commit signing certs, notarization creds, env files
+.env
+.env.*
+*.cer
+*.p12
+*.mobileprovision
+AuthKey_*.p8
+notarize_creds.txt

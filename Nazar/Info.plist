@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>LSUIElement</key>
+    <true/>
+    <key>CFBundleExecutable</key>
+    <string>Nazar</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleName</key>
+    <string>Nazar</string>
+    <key>CFBundleDisplayName</key>
+    <string>Nazar</string>
+    <key>CFBundleIdentifier</key>
+    <string>app.nazar</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026. All rights reserved.</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>13.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>Nazar URL Scheme</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>nazar</string>
+            </array>
+        </dict>
+    </array>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Nazar uses Apple Events to empty the Trash via Finder during cleanup.</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Nazar may access the Desktop to save diagnostic feedback files when you choose to.</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>Nazar cleans old files from your Downloads folder according to the age filter you choose.</string>
+</dict>
+</plist>
