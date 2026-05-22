@@ -384,6 +384,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         NSApp.setActivationPolicy(.accessory)
         Logger.shared.installCrashHandlers()
         Logger.shared.info("App launched — \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?")")
+        // Boot the Sparkle updater early so its background poll timer arms.
+        _ = UpdaterManager.shared
 
         // Register URL scheme handler — enables nazar://cleanup, nazar://dashboard for
         // automation (Shortcuts, scripts, testing).
@@ -731,6 +733,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         sub.addItem(menuItem(L.t("menu.quickRef"), #selector(showHelp)))
         sub.addItem(menuItem(L.t("menu.replayTutorial"), #selector(replayTutorial)))
         sub.addItem(.separator())
+        sub.addItem(menuItem("Check for Updates…", #selector(checkForUpdates)))
         sub.addItem(menuItem(L.t("menu.revealLog"), #selector(revealLog)))
         sub.addItem(menuItem(L.t("menu.checkPerms"), #selector(checkPermissions)))
         sub.addItem(.separator())
@@ -738,6 +741,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         parent.submenu = sub
         return parent
     }
+
+    @objc func checkForUpdates() { UpdaterManager.shared.checkForUpdates() }
 
     // MARK: - Actions
 

@@ -49,12 +49,33 @@ echo "==> swift build -c release"
 swift build -c release
 
 echo "==> Assembling app bundle"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 cp .build/release/Nazar "$APP/Contents/MacOS/Nazar"
 cp Nazar/Info.plist "$APP/Contents/Info.plist"
 cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
-echo "==> Codesigning with hardened runtime"
+# Embed Sparkle.framework — SPM produces it next to the binary; the .app needs
+# it under Contents/Frameworks. Also fix the binary's rpath so dyld finds it
+# there at launch.
+if [ -d ".build/release/Sparkle.framework" ]; then
+  echo "==> Embedding Sparkle.framework"
+  rsync -a ".build/release/Sparkle.framework" "$APP/Contents/Frameworks/"
+  install_name_tool -add_rpath "@executable_path/../Frameworks" \
+    "$APP/Contents/MacOS/Nazar" 2>/dev/null || true
+fi
+
+echo "==> Codesigning Sparkle XPC services + framework first (inside-out)"
+# Sign nested code before the outer bundle — otherwise codesign --deep refuses
+# to wrap pre-signed content with --options runtime.
+find "$APP/Contents/Frameworks/Sparkle.framework" \
+  \( -name "*.xpc" -o -name "Autoupdate" -o -name "Updater.app" \) | while read -r nested; do
+    codesign --force --options runtime --timestamp \
+      --sign "$IDENTITY" "$nested"
+done
+codesign --force --options runtime --timestamp \
+  --sign "$IDENTITY" "$APP/Contents/Frameworks/Sparkle.framework"
+
+echo "==> Codesigning app bundle with hardened runtime"
 codesign --force --options runtime --timestamp \
   --entitlements "$ENTITLEMENTS" \
   --sign "$IDENTITY" \

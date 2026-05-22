@@ -30,3 +30,9 @@ CCClear.app/
 *.mobileprovision
 AuthKey_*.p8
 notarize_creds.txt
+
+# Sparkle CLI tools — fetched via scripts/setup_sparkle.sh, not committed
+scripts/sparkle/
+
+# Build output from release scripts
+build/

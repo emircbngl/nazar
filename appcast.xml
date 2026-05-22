@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Nazar — release feed</title>
+        <link>https://github.com/emircbngl/nazar</link>
+        <description>Auto-update feed for Nazar.</description>
+        <language>en</language>
+        <!--
+            New releases get a <item> entry below.
+            For each release:
+              1. Build + notarize the DMG: `IDENTITY="..." ./scripts/notarize.sh`
+              2. Sign the DMG: `./scripts/sparkle/bin/sign_update build/Nazar-X.Y.Z.dmg`
+                 → copy the sparkle:edSignature value into the new <item>
+              3. Upload DMG to the GitHub Release for that tag
+              4. Add the <item> below, push appcast.xml to main
+            Existing installs pick it up within SUScheduledCheckInterval (24h).
+        -->
+        <item>
+            <title>1.0.0</title>
+            <description><![CDATA[
+                <h2>Nazar 1.0.0</h2>
+                <p>First public release. See the <a href="https://github.com/emircbngl/nazar/blob/main/CHANGELOG.md">changelog</a> for the full feature list.</p>
+            ]]></description>
+            <pubDate>Fri, 22 May 2026 12:00:00 +0000</pubDate>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <!--
+                This first release has no DMG attached yet (will be added once
+                notarized). Sparkle will simply report "you are up to date" until
+                a real <enclosure> + signature lands here.
+            -->
+        </item>
+    </channel>
+</rss>

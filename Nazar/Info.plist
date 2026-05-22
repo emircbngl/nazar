@@ -45,5 +45,15 @@
     <string>Nazar may access the Desktop to save diagnostic feedback files when you choose to.</string>
     <key>NSDownloadsFolderUsageDescription</key>
     <string>Nazar cleans old files from your Downloads folder according to the age filter you choose.</string>
+    <key>SUFeedURL</key>
+    <string>https://raw.githubusercontent.com/emircbngl/nazar/main/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>rHlLUNhQxO4mm2tlJ3ik6vb63uEZMVFljnuicGIdyKI=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
+    <key>SUEnableInstallerLauncherService</key>
+    <false/>
 </dict>
 </plist>
