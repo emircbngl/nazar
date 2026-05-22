@@ -100,11 +100,35 @@ gh release create v1.0.0 \
   build/Nazar-1.0.0.dmg
 ```
 
-Users download from <https://github.com/your-username/nazar/releases>.
+Users download from <https://github.com/emircbngl/nazar/releases>.
 
 ## Sparkle (auto-updates)
 
 [Sparkle](https://sparkle-project.org/) is the de-facto auto-update framework for Mac apps. Users get an in-app "Update Available" prompt instead of having to recheck your release page.
+
+### Architecture — no server needed
+
+```
+GitHub (free)
+├─ appcast.xml          (in repo, served via raw.githubusercontent.com)
+└─ Releases/
+   └─ Nazar-1.0.1.dmg   (release asset, downloaded directly)
+```
+
+Sparkle inside the installed app polls `appcast.xml` once a day. If it sees
+a newer `<item>` than the installed version, it offers an update. The DMG
+URL inside the XML points to a GitHub Releases asset. **No hosting, no
+server, no domain. GitHub is the CDN.**
+
+### Release workflow
+
+For every new version:
+
+1. `IDENTITY=… ./scripts/notarize.sh`  →  `build/Nazar-X.Y.Z.dmg`
+2. `./bin/sign_update build/Nazar-X.Y.Z.dmg`  →  prints `sparkle:edSignature="..."`
+3. `gh release create vX.Y.Z build/Nazar-X.Y.Z.dmg --title "X.Y.Z" --notes ...`
+4. Edit `appcast.xml` — add a new `<item>` with version, signature, DMG URL, size
+5. `git push` — installed copies pick it up within 24h
 
 ### A. Generate an EdDSA key pair
 
@@ -161,7 +185,7 @@ let package = Package(
 
 ```xml
 <key>SUFeedURL</key>
-<string>https://raw.githubusercontent.com/your-username/nazar/main/appcast.xml</string>
+<string>https://raw.githubusercontent.com/emircbngl/nazar/main/appcast.xml</string>
 <key>SUPublicEDKey</key>
 <string>PASTE_YOUR_PUBLIC_KEY_HERE</string>
 <key>SUEnableAutomaticChecks</key>
@@ -221,7 +245,7 @@ sub.addItem(menuItem("Check for Updates…", #selector(checkForUpdates)))
       ]]></description>
       <pubDate>Mon, 03 Jun 2026 12:00:00 +0000</pubDate>
       <enclosure
-        url="https://github.com/your-username/nazar/releases/download/v1.0.1/Nazar-1.0.1.dmg"
+        url="https://github.com/emircbngl/nazar/releases/download/v1.0.1/Nazar-1.0.1.dmg"
         sparkle:version="2"
         sparkle:shortVersionString="1.0.1"
         sparkle:edSignature="EDDSA_SIGNATURE_HERE"

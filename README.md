@@ -73,7 +73,7 @@ Download the latest signed & notarized DMG from [Releases](../../releases), open
 ### Build from source
 
 ```bash
-git clone https://github.com/<your-username>/nazar.git
+git clone https://github.com/emircbngl/nazar.git
 cd nazar
 swift build -c release
 ```
