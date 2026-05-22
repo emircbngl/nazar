@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="430" viewBox="0 0 480 430" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro', sans-serif">
+  <!-- Background card -->
+  <rect width="480" height="430" rx="12" ry="12" fill="#252525"/>
+  <rect width="480" height="430" rx="12" ry="12" fill="none" stroke="#3a3a3c" stroke-width="0.5"/>
+
+  <!-- App icon -->
+  <rect x="216" y="22" width="48" height="48" rx="10" fill="#1e1e1e" stroke="#3a3a3c" stroke-width="0.5"/>
+  <text x="240" y="58" font-size="28" text-anchor="middle">🧿</text>
+
+  <!-- Title -->
+  <text x="240" y="100" fill="#f5f5f7" font-size="15" font-weight="600" text-anchor="middle">Edit Profile</text>
+
+  <!-- NAME -->
+  <text x="40" y="140" fill="#6e6e73" font-size="9" font-weight="500" letter-spacing="1.4">NAME</text>
+  <rect x="40" y="148" width="400" height="26" rx="5" fill="#1e1e1e" stroke="#3a3a3c" stroke-width="0.5"/>
+  <text x="50" y="166" fill="#f5f5f7" font-size="13">Light Clean</text>
+
+  <!-- STEPS -->
+  <text x="40" y="200" fill="#6e6e73" font-size="9" font-weight="500" letter-spacing="1.4">STEPS</text>
+
+  <rect x="40" y="216" width="13" height="13" rx="2" fill="none" stroke="#48484a" stroke-width="1"/>
+  <text x="62" y="228" fill="#f5f5f7" font-size="13">Close Apps</text>
+
+  <rect x="40" y="240" width="13" height="13" rx="2" fill="#0a84ff" stroke="#0a84ff"/>
+  <path d="M43 246 L46 249 L51 242" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="62" y="252" fill="#f5f5f7" font-size="13">Disk Cleanup</text>
+
+  <rect x="40" y="264" width="13" height="13" rx="2" fill="none" stroke="#48484a" stroke-width="1"/>
+  <text x="62" y="276" fill="#f5f5f7" font-size="13">System Updates</text>
+
+  <rect x="40" y="288" width="13" height="13" rx="2" fill="none" stroke="#48484a" stroke-width="1"/>
+  <text x="62" y="300" fill="#f5f5f7" font-size="13">Launch Startup Apps</text>
+
+  <!-- SHORTCUT -->
+  <text x="40" y="334" fill="#6e6e73" font-size="9" font-weight="500" letter-spacing="1.4">SHORTCUT</text>
+  <rect x="40" y="342" width="340" height="28" rx="5" fill="#1e1e1e" stroke="#3a3a3c" stroke-width="0.5"/>
+  <text x="210" y="361" fill="#f5f5f7" font-size="13" font-weight="500" text-anchor="middle">⌃⌥L</text>
+  <text x="395" y="361" fill="#f5f5f7" font-size="12" text-anchor="middle">Clear</text>
+
+  <!-- Skip confirm -->
+  <rect x="40" y="386" width="13" height="13" rx="2" fill="none" stroke="#48484a" stroke-width="1"/>
+  <text x="62" y="398" fill="#f5f5f7" font-size="13">Skip confirmation for this profile</text>
+
+  <!-- Save / Cancel -->
+  <text x="395" y="416" fill="#0a84ff" font-size="13" font-weight="600" text-anchor="middle">Save</text>
+  <text x="335" y="416" fill="#f5f5f7" font-size="13" text-anchor="middle">Cancel</text>
+</svg>

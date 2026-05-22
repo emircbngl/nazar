@@ -5,19 +5,19 @@
 
   <p><em>A minimalist macOS menu bar utility that closes apps, cleans caches, empties the Trash, checks for system updates, and relaunches your favorite apps — all in one click.</em></p>
 
-  <img src="docs/dashboard.svg" alt="Nazar Dashboard" width="420">
-
   <p>
     <a href="https://github.com/emircbngl/nazar/actions/workflows/build.yml"><img src="https://github.com/emircbngl/nazar/actions/workflows/build.yml/badge.svg" alt="Build"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
     <a href="#requirements"><img src="https://img.shields.io/badge/macOS-13.0+-black.svg" alt="macOS 13+"></a>
     <a href="#"><img src="https://img.shields.io/badge/swift-5.9-orange.svg" alt="Swift 5.9"></a>
   </p>
+
+  <img src="docs/dashboard.svg" alt="Nazar Dashboard" width="420">
 </div>
 
 > ⚠️ **Destructive operations**: Nazar deletes files (caches, logs, Trash, temp). Back up before first use. The author is not responsible for data loss.
 
-> ℹ️ The dashboard preview above uses **synthetic data**. No personal information is included in this repository.
+> ℹ️ All screenshots in this README use **synthetic data**. No personal information is included in this repository.
 
 ## Features
 
@@ -29,6 +29,25 @@
 - **Trigger modes** — double-tap the icon, double-click, ⌥-click, or long press
 - **Dashboard** — see disk usage, running apps, available updates at a glance
 - **Localized** — English and Turkish
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/menu.svg" width="260" alt="Right-click menu"></td>
+    <td align="center"><img src="docs/profiles.svg" width="380" alt="Profiles list"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Status bar menu</em></td>
+    <td align="center"><em>Profiles &amp; Shortcuts</em></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/editor.svg" width="380" alt="Profile editor"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><em>Profile editor — name, steps, optional global shortcut</em></td>
+  </tr>
+</table>
 
 ## Privacy
 

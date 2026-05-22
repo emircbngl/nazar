@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest a new behavior or change to an existing one.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        Describe the user-facing problem first. ("As someone who… I want…")
+        Avoid jumping straight to the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you address the problem? What does the UI / behavior look like?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues and discussions for similar requests.
+          required: true
