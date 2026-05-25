@@ -379,6 +379,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     private var isRunning = false
     private var lastClickTime: Date = .distantPast
     private var longPressTimer: Timer?
+    private let onboarding = OnboardingWindowController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -434,39 +435,35 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Onboarding
 
     func showOnboarding() {
-        let steps = [
-            (
+        let steps: [OnboardingView.Step] = [
+            .init(
                 title: "Welcome to Nazar 🧿",
-                message: """
+                body: """
                 Nazar lives in your menu bar and keeps your Mac clean with a single gesture.
 
                 It closes apps, cleans caches, empties trash, checks for updates, and relaunches your favorite apps — all in one go.
-
-                Let's set it up!
-                """,
-                button: "Next"
+                """
             ),
-            (
+            .init(
                 title: "How to Trigger",
-                message: """
+                body: """
                 By default, double-tap the 🧿 icon to start cleanup.
 
                 You can change this later:
-                • Double Touch (trackpad tap) ← default
+                • Double Touch (trackpad tap) — default
                 • Double Click (press down)
                 • ⌥ Option + Click
                 • Long Press (1 second)
 
                 Right-click the icon for the menu.
-                """,
-                button: "Next"
+                """
             ),
-            (
+            .init(
                 title: "⚠️ Important Warnings",
-                message: """
+                body: """
                 Please read carefully:
 
-                • Nazar will CLOSE all running apps before cleaning. Save your work first!
+                • Nazar will CLOSE all running apps before cleaning. Save your work first.
 
                 • You can PROTECT specific apps from being closed (always or one-time).
 
@@ -475,27 +472,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 • You'll be asked to grant Finder access — needed to empty the Trash.
 
                 • Nazar needs Full Disk Access for system caches: System Settings → Privacy & Security → Full Disk Access.
-                """,
-                button: "Next"
+                """
             ),
-            (
+            .init(
                 title: "Protected Apps",
-                message: """
+                body: """
                 Don't want certain apps closed during cleanup?
 
-                Right-click → Protected Apps lets you:
+                Right-click → Settings → Protected Apps lets you:
 
                 • Always protect — app is never closed (e.g. your music player)
                 • One-time protect — skip only on the next cleanup
                 • Protect All Once — keep everything open just this time
 
                 Protected apps stay running while everything else is cleaned.
-                """,
-                button: "Next"
+                """
             ),
-            (
+            .init(
                 title: "Dashboard & Age Filters",
-                message: """
+                body: """
                 Right-click → Dashboard opens a detailed view where you can:
 
                 • See all running apps and close them individually
@@ -508,46 +503,40 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 • Each folder can have its own filter
 
                 Only checked items are cleaned — you're always in control.
-                """,
-                button: "Next"
+                """
             ),
-            (
-                title: "Personalize Nazar",
-                message: """
-                Make it yours:
+            .init(
+                title: "Profiles & Shortcuts",
+                body: """
+                Build cleanup recipes that run with a single keystroke.
 
-                • Customize — change the menu bar emoji and completion message
-                • Startup Apps — apps that relaunch after cleanup
-                • Protected Apps — apps that won't be closed
-                • Set Shortcut — global keyboard shortcut
-                • Settings — toggle steps & trigger modes
-                """,
-                button: "Get Started!"
+                Right-click → Settings → Profiles & Shortcuts:
+                • Define profiles like "Light Clean" or "Just Updates"
+                • Each profile picks which steps to run
+                • Assign an optional global hotkey to each profile
+
+                The built-in "Full Cleanup" profile is what your main shortcut triggers.
+                """
+            ),
+            .init(
+                title: "You're set",
+                body: """
+                A few extras worth knowing:
+
+                • Settings → Appearance — change the menu bar emoji and done message
+                • Settings → Startup Apps — apps that relaunch after cleanup
+                • Help → Send Feedback — bug reports include logs automatically
+                • Help → Check for Updates — Sparkle handles auto-updates
+
+                Have fun. 🧿
+                """
             ),
         ]
 
-        for (index, step) in steps.enumerated() {
-            let alert = NSAlert()
-            alert.messageText = step.title
-            alert.informativeText = step.message
-            alert.addButton(withTitle: step.button)
-
-            if index > 0 {
-                alert.addButton(withTitle: "Skip Setup")
-            }
-
-            let response = alert.runModal()
-
-            // Skip button (second button)
-            if index > 0 && response == .alertSecondButtonReturn {
-                break
-            }
+        onboarding.show(steps: steps) { [weak self] in
+            UserDefaults.standard.set(true, forKey: "nazar_onboarding_done")
+            self?.requestPermissions()
         }
-
-        UserDefaults.standard.set(true, forKey: "nazar_onboarding_done")
-
-        // Prompt for accessibility/Finder after onboarding
-        requestPermissions()
     }
 
     func requestPermissions() {
