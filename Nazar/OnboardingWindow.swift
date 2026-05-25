@@ -22,7 +22,7 @@ struct OnboardingView: View {
             Divider().opacity(0.35)
             footer
         }
-        .frame(width: 480, height: 460)
+        .frame(width: 420, height: 380)
         .background(Color(NSColor.windowBackgroundColor))
     }
 
@@ -33,36 +33,56 @@ struct OnboardingView: View {
             ForEach(0..<steps.count, id: \.self) { i in
                 Capsule()
                     .fill(i == index ? Color.primary.opacity(0.8) : Color.primary.opacity(0.12))
-                    .frame(width: i == index ? 18 : 6, height: 6)
+                    .frame(width: i == index ? 16 : 5, height: 5)
                     .animation(.easeInOut(duration: 0.25), value: index)
             }
         }
-        .padding(.top, 22)
-        .padding(.bottom, 6)
+        .padding(.top, 16)
+        .padding(.bottom, 4)
     }
 
     private var content: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                if index == 0, let icon = Self.appIcon {
+                    HStack {
+                        Spacer()
+                        Image(nsImage: icon)
+                            .resizable()
+                            .interpolation(.high)
+                            .frame(width: 72, height: 72)
+                        Spacer()
+                    }
+                    .padding(.top, 4)
+                    .padding(.bottom, 4)
+                }
                 Text(steps[index].title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .id("title-\(index)")
+                    .font(.system(size: 17, weight: .semibold))
+                    .frame(maxWidth: .infinity, alignment: index == 0 ? .center : .leading)
                 Text(steps[index].body)
-                    .font(.system(size: 13))
-                    .lineSpacing(4)
+                    .font(.system(size: 12.5))
+                    .lineSpacing(3)
                     .foregroundStyle(.primary.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)
-                    .id("body-\(index)")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 28)
-            .padding(.top, 14)
-            .padding(.bottom, 20)
+            .padding(.horizontal, 24)
+            .padding(.top, 10)
+            .padding(.bottom, 16)
         }
         .scrollIndicators(.never)
-        // Cross-fade between steps; window chrome stays put.
         .transition(.opacity)
         .animation(.easeInOut(duration: 0.18), value: index)
+    }
+
+    /// Best-effort app icon lookup. Falls back to bundle resource if the
+    /// running app's icon image isn't available yet (early launch).
+    private static var appIcon: NSImage? {
+        if let img = NSApp.applicationIconImage, img.size.width > 0 { return img }
+        if let path = Bundle.main.path(forResource: "AppIcon", ofType: "icns") {
+            return NSImage(contentsOfFile: path)
+        }
+        return nil
     }
 
     private var footer: some View {
@@ -118,7 +138,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         let host = NSHostingController(rootView: view)
 
         let w = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 460),
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 380),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
