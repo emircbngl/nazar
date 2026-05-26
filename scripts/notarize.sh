@@ -35,7 +35,11 @@ cd "$(dirname "$0")/.."
 IDENTITY="${IDENTITY:?Set IDENTITY env var to your Developer ID Application identity}"
 KEYCHAIN_PROFILE="${KEYCHAIN_PROFILE:-nazar-notarize}"
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Nazar/Info.plist)
+VERSION=""
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Nazar/Info.plist) \
+  || { echo "ERROR: could not read CFBundleShortVersionString" >&2; exit 1; }
+[ -n "$VERSION" ] || { echo "ERROR: CFBundleShortVersionString is empty" >&2; exit 1; }
+
 BUILD_DIR="build"
 APP="$BUILD_DIR/Nazar.app"
 DMG="$BUILD_DIR/Nazar-$VERSION.dmg"
@@ -55,25 +59,42 @@ cp Nazar/Info.plist "$APP/Contents/Info.plist"
 cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 # Embed Sparkle.framework — SPM produces it next to the binary; the .app needs
-# it under Contents/Frameworks. Also fix the binary's rpath so dyld finds it
-# there at launch.
-if [ -d ".build/release/Sparkle.framework" ]; then
-  echo "==> Embedding Sparkle.framework"
-  rsync -a ".build/release/Sparkle.framework" "$APP/Contents/Frameworks/"
-  install_name_tool -add_rpath "@executable_path/../Frameworks" \
-    "$APP/Contents/MacOS/Nazar" 2>/dev/null || true
+# it under Contents/Frameworks. Hard fail if SPM ever moves the artifact —
+# otherwise we'd ship a bundle that crashes on launch with a dyld error.
+if [ ! -d ".build/release/Sparkle.framework" ]; then
+  echo "ERROR: .build/release/Sparkle.framework not found." >&2
+  echo "  SPM may have changed where it emits the framework. Investigate:" >&2
+  echo "  find .build/release -name 'Sparkle.framework' -type d" >&2
+  exit 1
 fi
 
-echo "==> Codesigning Sparkle XPC services + framework first (inside-out)"
-# Sign nested code before the outer bundle — otherwise codesign --deep refuses
-# to wrap pre-signed content with --options runtime.
-find "$APP/Contents/Frameworks/Sparkle.framework" \
-  \( -name "*.xpc" -o -name "Autoupdate" -o -name "Updater.app" \) | while read -r nested; do
-    codesign --force --options runtime --timestamp \
-      --sign "$IDENTITY" "$nested"
-done
+echo "==> Embedding Sparkle.framework"
+rsync -a ".build/release/Sparkle.framework" "$APP/Contents/Frameworks/"
+
+# Add @executable_path/../Frameworks to the binary's rpath so dyld finds the
+# embedded Sparkle at launch. Only add if not already present — `add_rpath`
+# silently duplicates entries, and unconditional `|| true` masks real errors.
+if ! /usr/bin/otool -l "$APP/Contents/MacOS/Nazar" \
+     | /usr/bin/grep -q '@executable_path/../Frameworks'; then
+  install_name_tool -add_rpath "@executable_path/../Frameworks" \
+    "$APP/Contents/MacOS/Nazar"
+fi
+
+echo "==> Codesigning Sparkle nested code, inside-out"
+# Use -depth so children are signed before their parent bundle — codesign on
+# a bundle re-seals it based on its current contents, so any later child
+# modification (including a sign) would invalidate the outer signature.
+# Match every signable artifact Sparkle ships: XPCServices, helper apps,
+# Autoupdate launcher, and any standalone Mach-O under those bundles.
+SPARKLE_FW="$APP/Contents/Frameworks/Sparkle.framework"
+while IFS= read -r -d '' nested; do
+  codesign --force --options runtime --timestamp \
+    --sign "$IDENTITY" "$nested"
+done < <(find "$SPARKLE_FW" -depth \
+  \( -name "*.xpc" -o -name "Updater.app" -o -name "Autoupdate" \) -print0)
+
 codesign --force --options runtime --timestamp \
-  --sign "$IDENTITY" "$APP/Contents/Frameworks/Sparkle.framework"
+  --sign "$IDENTITY" "$SPARKLE_FW"
 
 echo "==> Codesigning app bundle with hardened runtime"
 codesign --force --options runtime --timestamp \

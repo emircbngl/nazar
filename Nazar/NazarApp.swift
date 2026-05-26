@@ -533,9 +533,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             ),
         ]
 
+        // Only fire the permissions probe on the FIRST onboarding completion.
+        // Replays of the tutorial (Help → Show Tutorial Again) shouldn't
+        // re-trigger the AppleEvents prompt for users who already granted.
+        let isFirstRun = !UserDefaults.standard.bool(forKey: "nazar_onboarding_done")
         onboarding.show(steps: steps) { [weak self] in
             UserDefaults.standard.set(true, forKey: "nazar_onboarding_done")
-            self?.requestPermissions()
+            if isFirstRun {
+                self?.requestPermissions()
+            }
         }
     }
 
@@ -722,7 +728,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         sub.addItem(menuItem(L.t("menu.quickRef"), #selector(showHelp)))
         sub.addItem(menuItem(L.t("menu.replayTutorial"), #selector(replayTutorial)))
         sub.addItem(.separator())
-        sub.addItem(menuItem("Check for Updates…", #selector(checkForUpdates)))
+        sub.addItem(menuItem("Check Nazar for Updates…", #selector(checkForUpdates)))
         sub.addItem(menuItem(L.t("menu.revealLog"), #selector(revealLog)))
         sub.addItem(menuItem(L.t("menu.checkPerms"), #selector(checkPermissions)))
         sub.addItem(.separator())
@@ -1413,6 +1419,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     /// confirmation dialog header.
     func runCleanup(steps: [NazarSettings.Step]?, profileName: String?, skipConfirm: Bool) {
         guard !isRunning else { return }
+
+        // Defer cleanup while onboarding is still on screen — the user
+        // hasn't finished reading the safety warning, AppleEvents permission
+        // hasn't been probed, and a stray menu-bar click during the wizard
+        // shouldn't silently nuke their session.
+        if onboarding.isShown {
+            NSApp.activate(ignoringOtherApps: true)
+            onboarding.bringToFront()
+            Logger.shared.info("Cleanup deferred — onboarding in progress")
+            return
+        }
 
         let settings = NazarSettings.shared
         let look = AppearanceManager.shared

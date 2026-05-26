@@ -2,6 +2,23 @@
 
 Thanks for considering a contribution. A few ground rules to keep the project healthy.
 
+## ⚠️ Forking & redistributing
+
+If you fork this repo and ship your own build, **you MUST change two things**
+in `Nazar/Info.plist` before distributing — otherwise your users' Sparkle
+client will silently pull updates from this upstream repo's release feed and
+either install upstream binaries (signed by a different team, will fail
+verification) or get stuck on stale versions:
+
+1. **`SUFeedURL`** — point at *your* appcast.xml URL, not
+   `https://raw.githubusercontent.com/emircbngl/nazar/main/appcast.xml`.
+2. **`SUPublicEDKey`** — replace with the public key from *your own*
+   `generate_keys` run (`./scripts/sparkle/bin/generate_keys`). Your private
+   key signs the DMGs your users download; mismatched keys = rejected updates.
+
+Also bump `CFBundleIdentifier` to something under your own reverse-DNS so
+your build doesn't fight Nazar.app's preferences or notarization records.
+
 ## Before opening a PR
 
 1. **Open an issue first** for anything non-trivial — features, behavior changes, refactors. A 30-second comment from the maintainer can save you an afternoon of work.

@@ -234,7 +234,7 @@ struct MainView: View {
                 Button {
                     viewModel.checkForUpdates()
                 } label: {
-                    Text(viewModel.isCheckingUpdates ? "Checking…" : "Check for Updates")
+                    Text(viewModel.isCheckingUpdates ? "Checking…" : "Check macOS for Updates")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

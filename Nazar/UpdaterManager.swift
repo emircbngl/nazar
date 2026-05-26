@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Sparkle
 
@@ -21,7 +22,11 @@ final class UpdaterManager: NSObject {
     }
 
     /// Manual "Check for Updates…" — surfaces the standard Sparkle UI.
+    /// LSUIElement/.accessory apps don't get foreground status automatically,
+    /// so the update dialog would otherwise appear behind whatever's frontmost.
+    /// Activate first to make sure the user actually sees it.
     func checkForUpdates() {
+        NSApp.activate(ignoringOtherApps: true)
         controller.checkForUpdates(nil)
     }
 

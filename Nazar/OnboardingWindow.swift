@@ -69,9 +69,13 @@ struct OnboardingView: View {
             .padding(.horizontal, 24)
             .padding(.top, 10)
             .padding(.bottom, 16)
+            // Force re-creation on step change so the .transition has
+            // an insertion/removal event to animate against — without the
+            // .id() the inner Texts swap in place with no animation.
+            .id(index)
+            .transition(.opacity)
         }
         .scrollIndicators(.never)
-        .transition(.opacity)
         .animation(.easeInOut(duration: 0.18), value: index)
     }
 
@@ -90,7 +94,9 @@ struct OnboardingView: View {
             Button("Back") { if index > 0 { index -= 1 } }
                 .buttonStyle(.bordered)
                 .disabled(index == 0)
-                .keyboardShortcut(.leftArrow, modifiers: [])
+                // ⌘← so the bare ← arrow stays available for any future text
+                // field and isn't hijacked while Back is disabled.
+                .keyboardShortcut(.leftArrow, modifiers: .command)
 
             Spacer()
 
@@ -101,9 +107,13 @@ struct OnboardingView: View {
 
             Spacer()
 
-            if index < steps.count - 1 {
+            // Hide Skip on step 0 (Welcome) and the final step. The old
+            // alert flow gated Skip until step 2+ so users couldn't bail
+            // before seeing the destructive-action warning — preserve that.
+            if index > 0 && index < steps.count - 1 {
                 Button("Skip") { onDone() }
                     .buttonStyle(.bordered)
+                    .keyboardShortcut(.cancelAction)
             }
 
             Button(index == steps.count - 1 ? "Get Started" : "Next") {
@@ -127,10 +137,28 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private var onComplete: (() -> Void)?
 
+    /// True while the wizard window is on screen. Callers gate destructive
+    /// actions (like running a cleanup) on this so a stray menu-bar click
+    /// during onboarding doesn't fire before requestPermissions has run.
+    var isShown: Bool { window != nil }
+
+    /// Surfaces the wizard when a destructive action was deferred — gives
+    /// the user a visible cue to either finish or Skip onboarding.
+    func bringToFront() {
+        window?.makeKeyAndOrderFront(nil)
+    }
+
     func show(steps: [OnboardingView.Step], onComplete: @escaping () -> Void) {
-        guard window == nil else {
-            window?.makeKeyAndOrderFront(nil)
-            return
+        // If a wizard is already open (e.g. replayTutorial called while the
+        // first-launch window is still up), dismiss it so the new caller's
+        // steps + onComplete take effect — old guard silently dropped them.
+        if window != nil {
+            // Replace stored onComplete BEFORE closing — windowWillClose
+            // will fire the (already-replaced) old closure, which we want
+            // suppressed since we're transitioning to a new wizard.
+            self.onComplete = nil
+            window?.close()
+            window = nil
         }
         self.onComplete = onComplete
 
@@ -155,20 +183,22 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         w.makeKeyAndOrderFront(nil)
     }
 
+    /// Single completion site — funnels through windowWillClose.
+    /// Both finish() (Get Started / Skip) and the red X close path land here.
     private func finish() {
         window?.close()
-        window = nil
-        let cb = onComplete
-        onComplete = nil
-        cb?()
     }
 
-    // Window's red X = treat as Skip.
     func windowWillClose(_ notification: Notification) {
         guard window != nil else { return }
         window = nil
         let cb = onComplete
         onComplete = nil
-        cb?()
+        // Defer the callback so any sync work inside it (e.g.
+        // requestPermissions spawning Process+waitUntilExit) doesn't freeze
+        // the window-close animation.
+        if let cb = cb {
+            DispatchQueue.main.async { cb() }
+        }
     }
 }
