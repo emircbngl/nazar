@@ -112,6 +112,12 @@ This app is **not** on the Mac App Store and likely never will be — sandbox re
 
 Issues and pull requests welcome. Please open an issue first to discuss any non-trivial change.
 
+## Star history
+
+<a href="https://star-history.com/#emircbngl/nazar&Date">
+  <img src="https://api.star-history.com/svg?repos=emircbngl/nazar&type=Date" alt="Star history chart for emircbngl/nazar" width="640">
+</a>
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
